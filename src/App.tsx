@@ -1,16 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import VirtualList from "./VirtualList/VirtualList";
-import { useEffect } from "react";
-import { fetchUsers } from "./API";
 import { useMemo } from "react";
+import { RowRendererProps } from "./VirtualList/VirtualList.types";
+import { useFetchUsers } from "./hooks/useFetchUsers";
 
 const App = () => {
-  const [status, setStatus] = useState("init");
-  const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
+  const { status, users } = useFetchUsers();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
 
@@ -23,21 +22,7 @@ const App = () => {
       const name = user.name.toLowerCase();
       return name.includes(query.toLowerCase());
     });
-  }, [query]);
-
-  useEffect(() => {
-    setStatus("loading");
-
-    fetchUsers()
-      .then((users) => {
-        setStatus("success");
-        setUsers(users);
-      })
-      .catch((err) => {
-        console.log(err);
-        setStatus("error");
-      });
-  }, []);
+  }, [query, users.length]);
 
   if (status === "loading" || status === "init") {
     return <div>Loading...</div>;
@@ -47,7 +32,7 @@ const App = () => {
     return <div>Error!</div>;
   }
 
-  const rowRenderer = ({ style, index }) => {
+  const rowRenderer = ({ style, index }: RowRendererProps) => {
     return (
       <div key={filtredUsers[index]?.id} style={style}>
         <div className="user">{filtredUsers[index]?.name}</div>

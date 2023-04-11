@@ -1,19 +1,24 @@
 import React from "react";
 import { useState } from "react";
+import { VirtualListProps } from "./VirtualList.types";
 
-const VirtualList = ({ rowRenderer, itemsCount, itemHeight }) => {
-  const [wrapperEl, setWrapperEl] = useState();
+const VirtualList: React.FC<VirtualListProps> = ({
+  rowRenderer,
+  itemsCount,
+  itemHeight,
+}) => {
+  const [wrapperEl, setWrapperEl] = useState<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
   const listHeight = itemsCount * itemHeight;
   const containerHeight = wrapperEl?.clientHeight;
 
   const start = Math.floor(scrollTop / itemHeight);
-  const renderListLength = Math.ceil(containerHeight / itemHeight);
+  const renderListLength = Math.ceil(containerHeight! / itemHeight);
   const end = Math.min(itemsCount - 1, start + renderListLength);
 
-  const handleScroll = (e) => {
-    setScrollTop(e.target.scrollTop);
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
   };
 
   const items = [];
